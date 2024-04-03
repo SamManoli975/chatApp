@@ -1,4 +1,3 @@
-import "./App.css";
 import { io, Socket } from 'socket.io-client'; // Import 'io' and 'Socket' from 'socket.io-client'
 import { useEffect, useState } from "react";
 
