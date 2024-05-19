@@ -1,11 +1,23 @@
-const ws = require('ws');
-const server = new ws.Server({port: '3000'})
+import { HttpStatusCode } from "axios"
+import { createServer } from "https"
+import { Server } from "socket.io"
 
-server.on('connection',socket => {
-    socket.on('message', message => {
-        const b = Buffer.from(message)
+const httpServer = createServer()
 
-        console.log(b.toString())
-        socket.send(`${message}`)
+const io = new Server(httpServer, {
+    cors: {
+        origin: process.env.NODE_ENV === "production"
+         ? false : ["https://localhost:5500"]
+    }
+})
+
+io.on('connection',socket => {
+
+    console.log(`User ${socket.id} connected`)
+    socket.on('message', data => {
+        console.log(data)
+        io.emit('message', `${socket.id.substring(0,5)}: ${data}`)
     })
 })
+
+httpServer.listen(3000, () => console.log('listening on port 3000'))
