@@ -1,7 +1,15 @@
-import { createServer } from "http"
+import express from 'express'
 import { Server } from "socket.io"
+import path from 'path'
 
-const httpServer = createServer()
+const PORT = process.env.PORT || 3000
+
+const app = express()
+
+app.use(express.static(path.join(__dirname)))
+
+const expressServer = app.listen(PORT, () => {console.log       (`listening on port ${PORT}`)
+})
 
 const io = new Server(httpServer, {
     cors: {
@@ -17,5 +25,3 @@ io.on('connection', socket => {
         io.emit('message', `${socket.id.substring(0, 5)}: ${data}`)
     })
 })
-
-httpServer.listen(3500, () => console.log('listening on port 3500'))
