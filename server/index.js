@@ -27,7 +27,7 @@ const UsersState = {
 
 const io = new Server(expressServer, {
     cors: {
-        origin: process.env.NODE_ENV === "production" ? false : ["https://chatapp-gao4.onrender.com"]
+        origin: process.env.NODE_ENV === "production" ? false : ["https://chatapp-1-owus.onrender.com"]
     }
 })
 
