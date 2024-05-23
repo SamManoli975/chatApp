@@ -26,3 +26,7 @@ socket.on("message", (data) => {
 msgInput.addEventListener('keypress', () => {
     socket.emit('activity', socket.id.substring(0, 5))
 })
+
+socket.on("activity", (name) => {
+    activity.textContent = `${name} is typing...`
+})
