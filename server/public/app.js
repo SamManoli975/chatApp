@@ -6,7 +6,7 @@ const chatRoom = document.querySelector('#room')
 const activity = document.querySelector('.activity')
 const usersList = document.querySelector('.user-list')
 const roomList = document.querySelector('.room-list')
-const chatDisplau = document.querySelector('.chat-display')
+const chatDisplay = document.querySelector('.chat-display')
 
 
 function sendMessage(e) {
@@ -63,7 +63,9 @@ socket.on("message", (data) => {
     }else{//admin messages 
         li.innerHTML = `<div class="post__text">${text}</div>`
     }
-    document.querySelector('ul').appendChild(li)
+    document.querySelector('.chat-display').appendChild(li)
+
+    chatDisplay.scrollTop = chatDisplay.scrollHeight
 })
 
 
@@ -76,5 +78,38 @@ socket.on("activity", (name) => {
     clearTimeout(activityTimer)
     activityTimer = setTimeout(() => {
         activity.textContent = ""
-    }, 1000)
+    }, 2300)
 })
+
+socket.on('userList', ({users}) => {
+    showUsers(users)
+})
+
+socket.on('roomList', ({rooms}) => {
+    showRooms(rooms)
+})
+
+function showUsers(users){
+    usersList.textContent = ''
+    if(users){
+        usersList.innerHTML = `<em>Users in ${chatRoom.value}:</em>`
+        users.forEach((user, i) => {
+            usersList.textContent += `${user.name}`
+            if(users.length > 1 && i !== users.length -1){
+                usersList.textContent += ","
+            }
+        })
+    }
+}
+function showRooms(rooms){
+    roomList.textContent = ''
+    if(rooms){
+        roomList.innerHTML = `<em>Active Rooms:</em>`
+        rooms.forEach((room, i) => {
+            roomList.textContent += `${room}`
+            if(rooms.length > 1 && i !== rooms.length -1){
+                roomList.textContent += ","
+            }
+        })
+    } 
+}
