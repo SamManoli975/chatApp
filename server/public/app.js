@@ -1,4 +1,4 @@
-const socket = io('https://chatapp-4-21qj.onrender.com')
+const socket = io('ws://localhost:3000')
 
 const msgInput = document.querySelector('#message')
 const nameInput = document.querySelector('#name')
@@ -8,24 +8,21 @@ const usersList = document.querySelector('.user-list')
 const roomList = document.querySelector('.room-list')
 const chatDisplay = document.querySelector('.chat-display')
 
-
 function sendMessage(e) {
     e.preventDefault()
-    
     if (nameInput.value && msgInput.value && chatRoom.value) {
         socket.emit('message', {
             name: nameInput.value,
-            text:msgInput.value,
-    })
+            text: msgInput.value
+        })
         msgInput.value = ""
     }
     msgInput.focus()
 }
 
-
-function enterRoom(e){
-    e.preventDefault
-    if(nameInput.value && chatRoom.value){
+function enterRoom(e) {
+    e.preventDefault()
+    if (nameInput.value && chatRoom.value) {
         socket.emit('enterRoom', {
             name: nameInput.value,
             room: chatRoom.value
@@ -33,9 +30,11 @@ function enterRoom(e){
     }
 }
 
-document.querySelector('.form-msg').addEventListener('submit', sendMessage)
+document.querySelector('.form-msg')
+    .addEventListener('submit', sendMessage)
 
-document.querySelector('.form-join').addEventListener('submit', enterRoom)
+document.querySelector('.form-join')
+    .addEventListener('submit', enterRoom)
 
 msgInput.addEventListener('keypress', () => {
     socket.emit('activity', nameInput.value)
@@ -44,21 +43,21 @@ msgInput.addEventListener('keypress', () => {
 // Listen for messages 
 socket.on("message", (data) => {
     activity.textContent = ""
-    const { name, text, time} =data
+    const { name, text, time } = data
     const li = document.createElement('li')
     li.className = 'post'
-    if(name === nameInput.value) li.className = 'post post--left'
-    if(name !== nameInput.value && name !== 'Admin') li.className = 'post post--right'
-    if(name !== 'Admin'){
-        li.innerHTML = `<div class="post__header ${name ===nameInput.value
+    if (name === nameInput.value) li.className = 'post post--left'
+    if (name !== nameInput.value && name !== 'Admin') li.className = 'post post--right'
+    if (name !== 'Admin') {
+        li.innerHTML = `<div class="post__header ${name === nameInput.value
             ? 'post__header--user'
             : 'post__header--reply'
-        }">
-        <span class="post__header--name">${name}</span>
-        <span class="post__header--time">${time}</span>
+            }">
+        <span class="post__header--name">${name}</span> 
+        <span class="post__header--time">${time}</span> 
         </div>
         <div class="post__text">${text}</div>`
-    }else{//admin messages 
+    } else {
         li.innerHTML = `<div class="post__text">${text}</div>`
     }
     document.querySelector('.chat-display').appendChild(li)
@@ -66,48 +65,47 @@ socket.on("message", (data) => {
     chatDisplay.scrollTop = chatDisplay.scrollHeight
 })
 
-
-
 let activityTimer
 socket.on("activity", (name) => {
     activity.textContent = `${name} is typing...`
 
-    //clear after 1 second
+    // Clear after 3 seconds 
     clearTimeout(activityTimer)
     activityTimer = setTimeout(() => {
         activity.textContent = ""
-    }, 2300)
+    }, 3000)
 })
 
-socket.on('userList', ({users}) => {
+socket.on('userList', ({ users }) => {
     showUsers(users)
 })
 
-socket.on('roomList', ({rooms}) => {
+socket.on('roomList', ({ rooms }) => {
     showRooms(rooms)
 })
 
-function showUsers(users){
+function showUsers(users) {
     usersList.textContent = ''
-    if(users){
+    if (users) {
         usersList.innerHTML = `<em>Users in ${chatRoom.value}:</em>`
         users.forEach((user, i) => {
-            usersList.textContent += `${user.name}`
-            if(users.length > 1 && i !== users.length -1){
+            usersList.textContent += ` ${user.name}`
+            if (users.length > 1 && i !== users.length - 1) {
                 usersList.textContent += ","
             }
         })
     }
 }
-function showRooms(rooms){
+
+function showRooms(rooms) {
     roomList.textContent = ''
-    if(rooms){
-        roomList.innerHTML = `<em>Active Rooms:</em>`
+    if (rooms) {
+        roomList.innerHTML = '<em>Active Rooms:</em>'
         rooms.forEach((room, i) => {
-            roomList.textContent += `${room}`
-            if(rooms.length > 1 && i !== rooms.length -1){
+            roomList.textContent += ` ${room}`
+            if (rooms.length > 1 && i !== rooms.length - 1) {
                 roomList.textContent += ","
             }
         })
-    } 
+    }
 }
