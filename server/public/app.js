@@ -60,6 +60,8 @@ socket.on("message", (data) => {
         <span class="post__header--time">${time}</span>
         </div>
         <div class="post__text">${text}</div>`
+    }else{//admin messages 
+        li.innerHTML = `<div class="post__text">${text}</div>`
     }
     document.querySelector('ul').appendChild(li)
 })
