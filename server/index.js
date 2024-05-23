@@ -35,9 +35,48 @@ io.on('connection', socket => {
     console.log(`User ${socket.id} connected`)
 
     // Upon connection - only to user
-    socket.emit('message', "Welcome!")
+    socket.emit('message', buildMsg(ADMIN, "Welcome!"))
 
-    socket.broadcast.emit('message', `${socket.id.substring(0, 5)} connected`)
+    //upon connection to all users in the room
+    socket.on('enterRoom', ({name,room}) => {
+        //leave previous room
+        const prevRoom = getUser(socket.id)?.room
+
+        if(prevRoom){
+            socket.leave(prevRoom)
+            io.to(prevRoom).emit('message',buildMsg(ADMIN,` ${name} has left the room`))
+        }
+
+        const user = activateUser(socket.id,name,room)
+
+        //cannot update previous room users list until state update in activate user
+        if (prevRoom){
+            io.to(prevRoom).emit('userList', {
+                users: getUsersInRoom(prevRoom)
+            })
+        }
+
+        //join room
+        socket.join(user.room)
+        
+        //to user who entered room
+        socket.emit('message', buildMsg(ADMIN,`You have joined the ${user.room} chat room`))
+
+        //to everyone else
+        socket.broadcast.to(user.room).emit('message',buildMsg(ADMIN, `${user.room} has joined the chat room`))
+
+        //update user list for room
+        io.to(user.room).emit('userList', {
+            users: getUsersInRoom(user.room)
+        })
+
+        //update rooms list for everyone
+        io.emit('roomList', {
+            rooms: getAllActiveRooms
+        })
+        
+    })
+
     socket.on('message', data => {
         console.log(data)
         io.emit('message', `${socket.id.substring(0, 5)}: ${data}`)
@@ -87,7 +126,7 @@ function getUser(id){
     return UsersState.users.find(user => user.id === id)
 }
 
-function getUserInRoom(room){
+function getUsersInRoom(room){
     return UsersState.users.filter(user => user.room ===room)
 }
 
