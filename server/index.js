@@ -77,18 +77,39 @@ io.on('connection', socket => {
         
     })
 
-    socket.on('message', data => {
-        console.log(data)
-        io.emit('message', `${socket.id.substring(0, 5)}: ${data}`)
+    socket.on('disconnect', () => {
+        const user = getUser(socket.id)
+        userLeave(socket.id)
+        
+        if(user){
+            io.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has left the room`))
+
+            io.to(user.room).emit('UserList', {
+                users: getUsersInRoom(user.room)
+            })
+            to.emit('roomList', {
+                rooms: getAllActiveRooms
+            })
+        }
+        console.log(`user ${socket.id} has disconnected`)
     })
 
-    socket.on('disconnect', () => {
-        socket.broadcast.emit('message', `${socket.id.substring(0, 5)} disonnected`)
+    socket.on('message', ({name,text}) => {
+        const room = getUser(socket.id)?.room
+        if(room){
+            io.to(room).emit('message',buildMsg(name, text))
+        }
+        
     })
+
+    
 
     //listen for activity
     socket.on('activity', (name) => {
-        socket.broadcast.emit('activity', name )
+        const room = getUser(socket.id)?.room
+        if(room){
+            socket.broadcast.to(room).emit('activitu', name)
+        }
     })
 })
 
