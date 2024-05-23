@@ -33,4 +33,13 @@ io.on('connection', socket => {
         console.log(data)
         io.emit('message', `${socket.id.substring(0, 5)}: ${data}`)
     })
+
+    socket.on('disconnect', () => {
+        socket.broadcast.emit('message', `${socket.id.substring(0, 5)} disonnected`)
+    })
+
+    //listen for activity
+    socket.on('activity', (name) => {
+        socket.broadcast.emit('activity', name )
+    })
 })
