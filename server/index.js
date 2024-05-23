@@ -25,6 +25,10 @@ const io = new Server(expressServer, {
 io.on('connection', socket => {
     console.log(`User ${socket.id} connected`)
 
+    // Upon connection - only to user
+    socket.emit('message', "Welcome!")
+
+    socket.broadcast.emit('message', `${socket.id.substring(0, 5)} connected`)
     socket.on('message', data => {
         console.log(data)
         io.emit('message', `${socket.id.substring(0, 5)}: ${data}`)
