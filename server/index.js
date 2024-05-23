@@ -3,6 +3,7 @@ import { Server } from "socket.io"
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+console.log('i am working')
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -27,7 +28,7 @@ const UsersState = {
 
 const io = new Server(expressServer, {
     cors: {
-        origin: process.env.NODE_ENV === "production" ? false : ["https://chatapp-1-owus.onrender.com"]
+        origin: process.env.NODE_ENV === "production" ? false : ["https://chatapp-2-tp3f.onrender.com"]
     }
 })
 
